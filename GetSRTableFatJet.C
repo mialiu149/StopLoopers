@@ -57,7 +57,7 @@ void GetSRTableFatJet(){
     if(n==0) datasetstring = "TTbar_fatjet";
     else if(n==1) datasetstring = "TTbar_fatjet";
     else if(n==2) datasetstring = "TTbar_fatjet";
-    TString x = ("rootfiles/CutHistos/FatJetPlots/"+datasetstring+".root");
+    TString x = ("~mliu/public_html/rootfiles/CutHistos/FatJetPlots/"+datasetstring+".root");
     cout << x << endl;
       fbg[n] = TFile::Open(x);
       //  cout << fbg[n].IsZombie();
@@ -66,11 +66,11 @@ void GetSRTableFatJet(){
   for(unsigned int n=0; n<sigsetsize; ++n) {
      if(skipping[bgsetsize+n]) continue;
    string datasetstring = datasets[bgsetsize+n];
-    TString x = ("rootfiles/CutHistos/FatJetPlots/"+datasetstring+".root");
+    TString x = ("~mliu/public_html/rootfiles/CutHistos/FatJetPlots/"+datasetstring+".root");
     cout << x << endl;
     fsig[n] = TFile::Open(x);
   }
-  string outputdir = "rootfiles/CutPlots/CutFlow/";
+  string outputdir = "~mliu/public_html/rootfiles/CutPlots/CutFlow/";
 
   vector<string> histonames;
 

@@ -70,6 +70,16 @@
 ./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TMatrixFUtils.h
 ./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TMatrixFUtilsfwd.h
 ./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TRotation.h
+./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TH2F.h
+./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TH2.h
+./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TH1.h
+./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TAxis.h
+./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TAttAxis.h
+./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TArrayC.h
+./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TArrayS.h
+./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TArrayF.h
+./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/Foption.h
+./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TFitResultPtr.h
 ./GetHistoFatJets_C.so: StopBabies06232015.cc StopBabies06232015.h
 ./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/Math/LorentzVector.h
 ./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/Math/GenVector/LorentzVector.h
@@ -93,14 +103,6 @@
 ./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/Math/GenVector/PositionVector3D.h
 ./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/Math/GenVector/DisplacementVector3Dfwd.h
 ./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TH1F.h
-./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TH1.h
-./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TAxis.h
-./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TAttAxis.h
-./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TArrayC.h
-./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TArrayS.h
-./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TArrayF.h
-./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/Foption.h
-./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TFitResultPtr.h
 ./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TBits.h
 ./GetHistoFatJets_C.so: stop_variables/Davismt2.h stop_variables/topness.h
 ./GetHistoFatJets_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TFitter.h

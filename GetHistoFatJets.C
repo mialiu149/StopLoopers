@@ -14,6 +14,7 @@
 #include "TROOT.h"
 #include "TTreeCache.h"
 #include "TLorentzVector.h"
+#include "TH2F.h"
 
 // CMS3
 #include "StopBabies06232015.cc"
@@ -65,7 +66,10 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
   histonames.push_back("dRLepBMax");          histobinn.push_back(25); histobinl.push_back(0.); histobinu.push_back(10.);
   histonames.push_back("dRLepBMin");          histobinn.push_back(25); histobinl.push_back(0.); histobinu.push_back(10.);
   histonames.push_back("dRLepFatJet");          histobinn.push_back(25); histobinl.push_back(0.); histobinu.push_back(5.);
-  histonames.push_back("ak8_Over_ak10");          histobinn.push_back(25); histobinl.push_back(0.); histobinu.push_back(3.);
+  histonames.push_back("ak8_Over_ak10");        histobinn.push_back(25); histobinl.push_back(0.); histobinu.push_back(3.);
+  histonames.push_back("mindRJet");             histobinn.push_back(50); histobinl.push_back(0.); histobinu.push_back(5.);
+  histonames.push_back("dRmaxJetFatJet");       histobinn.push_back(25); histobinl.push_back(0.); histobinu.push_back(5.);
+  histonames.push_back("dRJet1Jet2");           histobinn.push_back(25); histobinl.push_back(0.); histobinu.push_back(5.);
   histonames.push_back("dRJet1FatJet");          histobinn.push_back(25); histobinl.push_back(0.); histobinu.push_back(5.);
   histonames.push_back("dRJet2FatJet");          histobinn.push_back(25); histobinl.push_back(0.); histobinu.push_back(5.);
   histonames.push_back("dRJet3FatJet");          histobinn.push_back(25); histobinl.push_back(0.); histobinu.push_back(5.);
@@ -133,6 +137,23 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
   histonames.push_back("DeltaPhiWl");       histobinn.push_back(32); histobinl.push_back(0.); histobinu.push_back(3.2);
   histonames.push_back("DeltaPhiSubFatJet_MET");histobinn.push_back(32); histobinl.push_back(0.); histobinu.push_back(3.2);
 
+ //book 2d histograms
+  map<string, TH2F*> histos2d; //2d hists for distributions
+  vector<string> histonames2d; histonames2d.clear();
+  //x
+  vector<int> histobinnX; histobinnX.clear();
+  vector<float> histobinlX; histobinlX.clear();
+  vector<float> histobinuX; histobinuX.clear();
+  //y
+  vector<int> histobinnY; histobinnY.clear();
+  vector<float> histobinlY; histobinlY.clear();
+  vector<float> histobinuY; histobinuY.clear();
+
+  map<string, vector<float>> value2d;
+  histonames2d.push_back("boostjet_ak10_mass_vs_pt"); 
+  histobinnX.push_back(100); histobinlX.push_back(0.); histobinuX.push_back(1000.);
+  histobinnY.push_back(60); histobinlY.push_back(0.); histobinuY.push_back(300);
+ 
 // book Cutflow hists
     map<string, TH1D*> histos_cutflow;
     vector<string> histonames_cutflow; histonames_cutflow.clear();
@@ -145,10 +166,10 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
     histonames_cutflow.push_back("NEventsPerSignalRegion_boost5"); //pt lead pt fatjet  > 325
     histonames_cutflow.push_back("NEventsPerSignalRegion_boost6"); //pt lead pt fatjet  > 350
 
-  const unsigned int poststringsize =10 ;
-  string poststring[poststringsize] = {"SR","SR250","SR250MT2W","SR_boost_200","SR_boost_250",
-                                       "SR_boost_300","SR_boost_300_mass75","SR_boost_250_mass75","SR_boost_375_mass75","SR_boost_375_mass75_ak10only"};
-
+  const unsigned int poststringsize =13 ;
+  string poststring[poststringsize] = {"SR","SR_2jets","SR_3jets","SR_4jets","SR250","SR250MT2W","SR_boost_200","SR_boost_250",
+                                       "SR_boost_300","SR_boost_300_mass75","SR_boost_250_mass75",
+                                       "SR_boost_375_mass75","SR_boost_375_mass75_ak10only"};
   for(unsigned int b = 0; b<3; ++b){
     string samplename = skimFilePrefix;
     if(skimFilePrefix.find("TTbar")==std::string::npos&&b>0) continue;
@@ -164,6 +185,7 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
 	if(c==0) value[histonames[i] ] = -1;
       }
     } 
+  //book cutflow histograms
    for(unsigned int i = 0;i<histonames_cutflow.size();i++){
     string histoname = histonames_cutflow.at(i)+"_"+samplename;
     histos_cutflow[histoname] = new TH1D(histoname.c_str(),"",5,0,5);
@@ -175,8 +197,16 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
     histos_cutflow[histoname]->GetXaxis()->SetBinLabel(4,"MET>375,hDM");
     histos_cutflow[histoname]->GetXaxis()->SetBinLabel(5,"MET>400,hDM");
     }
+  //book 2D hists
+   for(unsigned int c = 0; c<poststringsize; ++c){
+     for(unsigned int i = 0; i<histonames2d.size(); ++i){
+	string mapname;
+	mapname = poststring[c] + "_" + histonames2d[i] + "_"+samplename;
+	if(histos2d.count(mapname) == 0 ) histos2d[mapname] = new TH2F(mapname.c_str(), "", histobinnX[i], histobinlX[i], histobinuX[i],histobinnY[i], histobinlY[i], histobinuY[i]);
+	histos2d[mapname]->Sumw2(); histos2d[mapname]->SetDirectory(rootdir);
+      }
+    }
   }
-
   int c1vtx(0), c1l(0), cno2l(0), cno2track(0), cnotau(0), c2j(0), c1b(0), cmet(0);
   int cmt(0), cmdphi(0), cchi(0);
   // Loop over events to Analyze
@@ -237,10 +267,14 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
       int nvtxs = cms3.nvtxs();
       float boostjet_ak8_pt = 0;
       float boostjet_ak10_pt = 0;
+      float boostjet_ak10_mass = 0;
       float boostjet_ak10_pt_sublead = 0;
       float boostjet_ak12_pt = 0;
       if(cms3.ak8pfjets_p4().size())  boostjet_ak8_pt = cms3.ak8pfjets_p4()[0].pt();
-      if(cms3.ak10pfjets_p4().size())  boostjet_ak10_pt = cms3.ak10pfjets_p4()[0].pt();
+      if(cms3.ak10pfjets_p4().size()) {
+        boostjet_ak10_pt = cms3.ak10pfjets_p4()[0].pt();
+        boostjet_ak10_mass = cms3.ak10pfjets_p4()[0].mass();
+      }
       if(cms3.ak10pfjets_p4().size()>1)  boostjet_ak10_pt_sublead = cms3.ak10pfjets_p4()[1].pt();
       if(cms3.ak12pfjets_p4().size())  boostjet_ak12_pt = cms3.ak12pfjets_p4()[0].pt();
       float minDPhi = cms3.mindphi_met_j1_j2();
@@ -362,16 +396,19 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
       if(NSLeps!=1) continue; ++cno2l;
       if(!trackveto) continue; ++cno2track;
       if(!tauveto) continue; ++cnotau;
-      if(NGJets<3) continue; ++c2j;
+      if(NGJets<2) continue; ++c2j;
       if(NGBJets<1) continue; ++c1b;
       if(MET<200) continue; ++cmet;
       if(MT<150) continue;
 //      if(!boostjet_ak10_pt) continue;
 
-      bool SR = false; bool SR250(false),SR250MT2W(false),SR_boost_200(false),SR_boost_250(false),SR_boost_300(false),SR_boost_300_mass75(false),SR_boost_250_mass75(false),SR_boost_375_mass75(false),SR_boost_375_mass75_ak10only(false);
+      bool SR = false;bool SR_2jets(false);bool SR_3jets(false);bool SR_4jets(false); bool SR250(false),SR250MT2W(false),SR_boost_200(false),SR_boost_250(false),SR_boost_300(false),SR_boost_300_mass75(false),SR_boost_250_mass75(false),SR_boost_375_mass75(false),SR_boost_375_mass75_ak10only(false);
 
       //if(MT>150 && MET>250 && MT2W>-1 && boostjet_ak10_pt>250) SR = true;
-      if(MT>150 && MET>300 && MT2W>-1 ) SR = true;
+      if(MT>150 && MET>250 && MT2W>-1 ) SR = true;
+      if(MT>150 && MET>250 && MT2W>-1 && NGJets >=2) SR_2jets = true;
+      if(MT>150 && MET>250 && MT2W>-1 && NGJets >=3) SR_3jets = true;
+      if(MT>150 && MET>250 && MT2W>-1 && NGJets >=4) SR_4jets = true;
       if(MT>150 && MET>300 && MT2W>-1 ) SR250 = true;
       if(MT>150 && MET>300 && minDPhi>0.8 && MT2W>200 && boostjet_ak10_pt>200) SR_boost_200 = true;
       if(MT>150 && MET>300 && minDPhi>0.8 && MT2W>200 && boostjet_ak10_pt>250) SR_boost_250 = true;
@@ -453,15 +490,35 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
       LorentzVector bjsumlep = jetlv[bj1] + jetlv[bj2] + jetlv[bj3];
       value["M3b"] = bjsumlep.M();
 
-
+      float dRmaxJetFatJet = -1;
+      float dRmaxJetFatJet_tmp = -1;
+      float mindRJet = -1;
+      float mindRJet_tmp = -1;
       if(cms3.ak8pfjets_p4().size()) value["DeltaPhiSubFatJet_MET"]   = JetUtil::deltaPhi(cms3.ak8pfjets_p4()[0],metlv);
       if(cms3.ak8pfjets_p4().size()&&cms3.ak10pfjets_p4().size()) value["ak8_Over_ak10"]   = cms3.ak8pfjets_trimmed_mass()[0]/cms3.ak10pfjets_trimmed_mass()[0];
-      if(cms3.ak10pfjets_p4().size()) value["dRLepFatJet"]   = JetUtil::deltaR(cms3.ak10pfjets_p4()[0],leplv);
-      if(cms3.ak10pfjets_p4().size()) value["dRJet1FatJet"]   = JetUtil::deltaR(cms3.ak10pfjets_p4()[0],jetlv[0]);
-      if(cms3.ak10pfjets_p4().size()) value["pT_diff_jet1_FatJet"]   = fabs(cms3.ak10pfjets_p4()[0].pt()-jetlv[0].pt());
-      if(cms3.ak10pfjets_p4().size()) value["dRJet2FatJet"]   = JetUtil::deltaR(cms3.ak10pfjets_p4()[0],jetlv[1]);
-      if(cms3.ak10pfjets_p4().size()) value["dRJet3FatJet"]   = JetUtil::deltaR(cms3.ak10pfjets_p4()[0],jetlv[2]);
-      if(cms3.ak10pfjets_p4().size()) value["dRJet4FatJet"]   = JetUtil::deltaR(cms3.ak10pfjets_p4()[0],jetlv[3]);
+         for(int isel=0;isel<jetlv.size();isel++){
+           if(isel==0) {mindRJet = JetUtil::deltaR(jetlv[isel],jetlv[1]);
+           mindRJet_tmp = mindRJet;}
+           else mindRJet = JetUtil::deltaR(jetlv[isel],jetlv[isel-1]);
+           mindRJet_tmp = std::min(mindRJet,mindRJet_tmp);           
+        }
+      value["mindRJet"] = mindRJet_tmp;
+      if(cms3.ak10pfjets_p4().size()) {
+        for(int isel=0;isel<jetlv.size();isel++){
+           if(isel==0) {dRmaxJetFatJet = JetUtil::deltaR(jetlv[isel],cms3.ak10pfjets_p4()[0]);
+           dRmaxJetFatJet_tmp = dRmaxJetFatJet;}
+           else dRmaxJetFatJet = JetUtil::deltaR(jetlv[isel],cms3.ak10pfjets_p4()[0]);
+           dRmaxJetFatJet_tmp = std::max(dRmaxJetFatJet,dRmaxJetFatJet_tmp);           
+        }
+      value["dRmaxJetFatJet" ] = dRmaxJetFatJet_tmp;
+      value["dRLepFatJet"]   = JetUtil::deltaR(cms3.ak10pfjets_p4()[0],leplv);
+      value["dRJet1FatJet"]   = JetUtil::deltaR(cms3.ak10pfjets_p4()[0],jetlv[0]);
+      value["dRJet1Jet2"]   = JetUtil::deltaR(jetlv[1],jetlv[0]);
+      value["pT_diff_jet1_FatJet"]   = fabs(cms3.ak10pfjets_p4()[0].pt()-jetlv[0].pt());
+      value["dRJet2FatJet"]   = JetUtil::deltaR(cms3.ak10pfjets_p4()[0],jetlv[1]);
+      value["dRJet3FatJet"]   = JetUtil::deltaR(cms3.ak10pfjets_p4()[0],jetlv[2]);
+      value["dRJet4FatJet"]   = JetUtil::deltaR(cms3.ak10pfjets_p4()[0],jetlv[3]);
+     }
       if(cms3.ak8pfjets_p4().size()&&cms3.ak10pfjets_p4().size()) value["dR_ak8_ak10"] = JetUtil::deltaR(cms3.ak10pfjets_p4()[0],cms3.ak8pfjets_p4()[0]); 
       if(cms3.ak8pfjets_p4().size()) value["ak8mass"]   = cms3.ak8pfjets_p4()[0].mass();
       if(cms3.ak8pfjets_trimmed_mass().size()) value["ak8prunedmass"]   = cms3.ak8pfjets_pruned_mass()[0];
@@ -565,6 +622,34 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
       for(unsigned int i = 0; i<histonames.size(); ++i){
 	value[histonames[i] ] = -1;//reset values
       }
+   
+     string d = "_";
+     if(SR){
+	string mname ="";
+	string histname ="";
+        //fill each histogram
+	histname ="boostjet_ak10_mass_vs_pt";
+	mname= "SR"+d+histname+d+samplename;
+        histos2d[mname]->Fill(boostjet_ak10_pt,boostjet_ak10_mass);
+      }
+
+      if(SR_3jets){
+	string mname ="";
+	string histname ="";
+        //fill each histogram
+	histname ="boostjet_ak10_mass_vs_pt";
+	mname= "SR_3jets"+d+histname+d+samplename;
+        histos2d[mname]->Fill(boostjet_ak10_pt,boostjet_ak10_mass);
+      }
+
+      if(SR_4jets){
+	string mname ="";
+	string histname ="";
+        //fill each histogram
+	histname ="boostjet_ak10_mass_vs_pt";
+	mname= "SR_4jets"+d+histname+d+samplename;
+        histos2d[mname]->Fill(boostjet_ak10_pt,boostjet_ak10_mass);
+      }
       //boosted regions
 //      if(MT>150 && MET>300 && minDPhi>0.8 && MT2W>200 && fabs(ak10pfjets_p4()[0].eta()) < 2.4 &&boostjet_ak10_pt>300 && cms3.ak10pfjets_trimmed_mass()[0]>75&&Gettopness_(MET,METPhi,leplv,btaggedjets,1)>7){
       if(MT>150 && MET>300 && minDPhi>0.8 && MT2W>200 && boostjet_ak10_pt>300  && fabs(ak10pfjets_p4()[0].eta()) < 2.4 && cms3.ak10pfjets_trimmed_mass()[0]>75){
@@ -613,7 +698,6 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
       if(MET>500) histos_cutflow["NEventsPerSignalRegion_boost6_"+samplename]  ->Fill(4.5,weight);
       }
       //nominal
-      //if(SR250MT2W && NGJets>=4 && Gettopness_(MET,METPhi,leplv,btaggedjets,1)>7){
       if(SR250MT2W && NGJets>=4){
       if(MET>300) histos_cutflow["NEventsPerSignalRegion_nominal_"+samplename]  ->Fill(0.5,weight);
       if(MET>350) histos_cutflow["NEventsPerSignalRegion_nominal_"+samplename]  ->Fill(1.5,weight);
@@ -621,7 +705,6 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
       if(MET>450) histos_cutflow["NEventsPerSignalRegion_nominal_"+samplename]  ->Fill(3.5,weight);
       if(MET>500) histos_cutflow["NEventsPerSignalRegion_nominal_"+samplename]  ->Fill(4.5,weight);
       //modified signal region
-      //if(SR250MT2W && NGJets>=3 && jetlv[0].pt()>150 && jetlv[1].pt()>80 && jetlv[2].pt()>50){
       if(SR250MT2W && NGJets>=3 && topnessMod() > 0){
       if(MET>300) histos_cutflow["NEventsPerSignalRegion_nominal_mod_"+samplename]  ->Fill(0.5,weight);
       if(MET>350) histos_cutflow["NEventsPerSignalRegion_nominal_mod_"+samplename]  ->Fill(1.5,weight);
@@ -632,7 +715,7 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
      }
       if(MT<120) continue; ++cmt;
       if(minDPhi<0.8) continue; ++cmdphi;
-      if(chi2>5) continue; ++cchi;
+      //if(chi2>5) continue; ++cchi;
     }
   
     // Clean Up
@@ -647,26 +730,37 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
   // Example Histograms
   // samplehisto->Draw();
 
-  for(map<string,TH1F*>::iterator h=histos.begin(); h!=histos.end();++h){
-    h->second->SetBinContent(h->second->GetNbinsX(), h->second->GetBinContent(h->second->GetNbinsX() )+ h->second->GetBinContent(h->second->GetNbinsX()+1) );
-    h->second->SetBinError(h->second->GetNbinsX(), sqrt(pow(h->second->GetBinError(h->second->GetNbinsX() ),2)+pow(h->second->GetBinError(h->second->GetNbinsX()+1),2) ) );
-  }
+   for(map<string,TH1F*>::iterator h=histos.begin(); h!=histos.end();++h){
+     h->second->SetBinContent(h->second->GetNbinsX(), h->second->GetBinContent(h->second->GetNbinsX() )+ h->second->GetBinContent(h->second->GetNbinsX()+1) );
+     h->second->SetBinError(h->second->GetNbinsX(), sqrt(pow(h->second->GetBinError(h->second->GetNbinsX() ),2)+pow(h->second->GetBinError(h->second->GetNbinsX()+1),2) ) );
+    }
 
-  string filename = "rootfiles/CutHistos/FatJetPlots/"+skimFilePrefix+".root";
-  TFile *f = new TFile(filename.c_str(),"RECREATE");
-  f->cd();
-  for(map<string,TH1F*>::iterator h=    histos.begin(); h!=    histos.end();++h) h->second->Write();
-  for(map<string,TH1D*>::iterator h=    histos_cutflow.begin(); h!=    histos_cutflow.end();++h) h->second->Write();
-  f->Close();
-  cout << "Saved histos in " << f->GetName() << endl;
-  // return
-  bmark->Stop("benchmark");
-  cout << endl;
-  cout << nEventsTotal << " Events Processed" << endl;
-  cout << "------------------------------" << endl;
-  cout << "CPU  Time:	" << Form( "%.01f", bmark->GetCpuTime("benchmark")  ) << endl;
-  cout << "Real Time:	" << Form( "%.01f", bmark->GetRealTime("benchmark") ) << endl;
-  cout << endl;
+   for(map<string,TH2F*>::iterator h=histos2d.begin(); h!=histos2d.end();++h){
+     for(int by = 1; by<=h->second->GetNbinsY();++by){
+       h->second->SetBinContent(h->second->GetNbinsX(), by, h->second->GetBinContent(h->second->GetNbinsX(),by)+ h->second->GetBinContent(h->second->GetNbinsX()+1,by) );
+       h->second->SetBinError(h->second->GetNbinsX(), by, sqrt(pow(h->second->GetBinError(h->second->GetNbinsX(),by),2)+pow(h->second->GetBinError(h->second->GetNbinsX()+1,by),2) ) );
+    }
+   for(int bx = 1; bx<=h->second->GetNbinsX();++bx){
+      h->second->SetBinContent(bx, h->second->GetNbinsY(), h->second->GetBinContent(bx, h->second->GetNbinsY() )+ h->second->GetBinContent(bx, h->second->GetNbinsY()+1) );
+      h->second->SetBinError(bx, h->second->GetNbinsY(), sqrt(pow(h->second->GetBinError(bx, h->second->GetNbinsY() ),2)+pow(h->second->GetBinError(bx, h->second->GetNbinsY()+1),2) ) );
+    }
+   } 
+   string filename = "/home/users/mliu/public_html/rootfiles/CutHistos/FatJetPlots/"+skimFilePrefix+".root";
+   TFile *f = new TFile(filename.c_str(),"RECREATE");
+   f->cd();
+   for(map<string,TH1F*>::iterator h=    histos.begin(); h!=    histos.end();++h) h->second->Write();
+   for(map<string,TH1D*>::iterator h=    histos_cutflow.begin(); h!=    histos_cutflow.end();++h) h->second->Write();
+   for(map<string,TH2F*>::iterator h=    histos2d.begin(); h!=    histos2d.end();++h) h->second->Write();
+   f->Close();
+   cout << "Saved histos in " << f->GetName() << endl;
+   // return
+   bmark->Stop("benchmark");
+   cout << endl;
+   cout << nEventsTotal << " Events Processed" << endl;
+   cout << "------------------------------" << endl;
+   cout << "CPU  Time:	" << Form( "%.01f", bmark->GetCpuTime("benchmark")  ) << endl;
+   cout << "Real Time:	" << Form( "%.01f", bmark->GetRealTime("benchmark") ) << endl;
+   cout << endl;
   delete bmark;
   return 0;
 }

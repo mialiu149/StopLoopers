@@ -455,7 +455,7 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
 				pow(h->second->GetBinError(h->second->GetNbinsX()+1,h->second->GetNbinsY()+1),2) ) );
     */
  }
-  string filename = "rootfiles/CutHistos/FatJetPlots/"+skimFilePrefix+".root";
+  string filename = "../rootfiles/CutHistos/FatJetPlots/"+skimFilePrefix+".root";
   TFile *f = new TFile(filename.c_str(),"RECREATE");
   f->cd();
   for(map<string,TH1F*>::iterator h=    histos.begin(); h!=    histos.end();++h) h->second->Write();

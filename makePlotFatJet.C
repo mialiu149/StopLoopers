@@ -44,13 +44,13 @@ void makePlotFatJet(){
     if(n==0) datasetstring = "TTbar_fatjet";
     else if(n==1) continue;
     //else if(n==2) continue;
-    TString x = ("rootfiles/CutHistos/FatJetPlots/"+datasetstring+".root");
+    TString x = ("~mliu/public_html/rootfiles/CutHistos/FatJetPlots/"+datasetstring+".root");
       fbg[n] = TFile::Open(x);
   }
   TFile *fsig[sigsetsize];
   for(unsigned int n=0; n<sigsetsize; ++n) {
     string datasetstring = datasets[bgsetsize+n];
-    TString x = ("rootfiles/CutHistos/FatJetPlots/"+datasetstring+".root");
+    TString x = ("~mliu/public_html/rootfiles/CutHistos/FatJetPlots/"+datasetstring+".root");
     fsig[n] = TFile::Open(x);
   }
   string outputdir = "~mliu/public_html/FatJetPlots/";
@@ -63,6 +63,9 @@ void makePlotFatJet(){
   histonames.push_back("dRLepFatJet");                 
   histonames.push_back("dR_ak8_ak10");                 
   histonames.push_back("pT_diff_jet1_FatJet");                 
+  histonames.push_back("dRmaxJetFatJet");                 
+  histonames.push_back("mindRJet");                 
+  histonames.push_back("dRJet1Jet2");                 
   histonames.push_back("dRJet1FatJet");                 
   histonames.push_back("dRJet2FatJet");                 
   histonames.push_back("dRJet3FatJet");                 

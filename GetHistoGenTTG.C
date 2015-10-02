@@ -18,7 +18,7 @@
 #include "TH2F.h"
 
 // CMS3
-#include "StopBabies08252015.cc"
+#include "StopBabies09042015.cc"
 
 //MT2 variants
 #include "stop_variables/Davismt2.h"
@@ -81,11 +81,13 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
   histonames_vec.push_back("genqs_motherid");    histobinn_vec.push_back(1000); histobinl_vec.push_back(0.); histobinu_vec.push_back(1000.);
 
   histonames.push_back("gentop_pt");  histobinn.push_back(85); histobinl.push_back(0.); histobinu.push_back(1700.);
-  histonames.push_back("genz_pt");  histobinn.push_back(25); histobinl.push_back(100.); histobinu.push_back(600.);
-  histonames.push_back("geng_pt");  histobinn.push_back(85); histobinl.push_back(0.); histobinu.push_back(1700.);
+  histonames.push_back("genz_pt");    histobinn.push_back(25); histobinl.push_back(100.); histobinu.push_back(600.);
+  histonames.push_back("geng_pt");    histobinn.push_back(85); histobinl.push_back(0.); histobinu.push_back(1700.);
+  histonames.push_back("gamma_pt");   histobinn.push_back(25); histobinl.push_back(100.); histobinu.push_back(600.);
+  histonames.push_back("gamma_genmatched_pt");   histobinn.push_back(25); histobinl.push_back(100.); histobinu.push_back(600.);
   histonames.push_back("genz_mass");  histobinn.push_back(85); histobinl.push_back(0.); histobinu.push_back(1700.);
   histonames.push_back("gentop_eta"); histobinn.push_back(10); histobinl.push_back(0.); histobinu.push_back(5.);
-  histonames.push_back("gen_wb");    histobinn.push_back(100); histobinl.push_back(0.); histobinu.push_back(5.);
+  histonames.push_back("gen_wb");     histobinn.push_back(100); histobinl.push_back(0.); histobinu.push_back(5.);
   histonames.push_back("gentop_phi"); histobinn.push_back(10); histobinl.push_back(-5); histobinu.push_back(5.);
 
   map<string, TH2F*> histos2d; //2d hists for distributions
@@ -178,7 +180,7 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
       ++nEventsTotal;
    
       // Progress
-      StopBabies08252015::progress( nEventsTotal, nEventsChain );
+      StopBabies09042015::progress( nEventsTotal, nEventsChain );
 
       string samplename = skimFilePrefix;
       if(skimFilePrefix=="TTbar"){
@@ -261,6 +263,8 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
       vector<LorentzVector> els_fromZ;
       vector<LorentzVector> mus_fromZ;
       vector<LorentzVector> taus_fromZ;
+      vector<LorentzVector> reco_gamma;
+      vector<LorentzVector> reco_gamma_genmatched;
 
       vector<LorentzVector> ws_lep;
       vector<LorentzVector> ws_had;
@@ -276,9 +280,16 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
        }
       }
       for (int i=0;i<cms3.genphs_p4().size();i++) {
-        if(fabs(cms3.genphs_motherid().at(i)) < 7 && (cms3.genphs_status().at(i)==23 || cms3.genphs_status().at(i)==1)){
-         gs_fromT.push_back(genphs_p4().at(i));
-       }
+        if (!(cms3.genphs_status().at(i)==23 || cms3.genphs_status().at(i)==1))  continue;
+        if (fabs(cms3.genphs_simplemotherid().at(i)) > 22  && cms3.genphs_simplemotherid().at(i)!=2212) continue;  
+        if (fabs(genphs_p4().at(i).eta())>2.5) continue;
+        gs_fromT.push_back(genphs_p4().at(i));
+      }
+     for (int i=0;i<ph_p4().size();i++) {
+        if(ph_chiso().at(i) < 2.5 && ph_idCutBased().at(i)) reco_gamma.push_back(ph_p4().at(i));
+        if(ph_chiso().at(i) < 2.5 && ph_idCutBased().at(i) && ph_mcMatchId().at(i) > 0) {
+         reco_gamma_genmatched.push_back(ph_p4().at(i));
+        }
       }
     //find b and bbar
 //      if(bs.size()<2) continue;//skipping events with less than 2 b quarks.
@@ -331,8 +342,7 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
           ts.push_back(i);
         }
       }
-// fill in genMET vector
-     
+     // fill in genMET vector
       ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > genmetlv;
       ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > genmetlv_mod;
       genmetlv.SetPxPyPzE(genMETx,genMETy,0.,genMET);
@@ -389,12 +399,14 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
     if(is1l){
     if(gs_fromT.size()) { if(gs_fromT.at(0).pt()>100) value["genz_pt"] = gs_fromT.at(0).pt(); }
     if(zboson.mass() > 40) value["genz_mass"] = zboson.mass();
-    if(gs_fromT.size())  value["geng_pt"] = gs_fromT.at(0).pt();
+    if(gs_fromT.size())  value["geng_pt"] = gs_fromT.at(0).pt(); 
+    if(reco_gamma.size()) { if(reco_gamma.at(0).pt()>100) value["gamma_pt"] = reco_gamma.at(0).pt();};
+    if(reco_gamma_genmatched.size()) {if(reco_gamma_genmatched.at(0).pt()>100) value["gamma_genmatched_pt"] = reco_gamma_genmatched.at(0).pt();}
     }
     bool noMET(true),MET100(false),MET300(false);
 
     if(genmetlv_mod.pt() > 300) MET300 = true;
-  
+     
     for(unsigned int i = 0; i<histonames.size(); ++i){
 	string d = "_";
 	string mname;
@@ -467,7 +479,7 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
 				pow(h->second->GetBinError(h->second->GetNbinsX()+1,h->second->GetNbinsY()+1),2) ) );
     */
  }
-  string filename = "rootfiles/CutHistos/FatJetPlots/"+skimFilePrefix+".root";
+  string filename = "../rootfiles/CutHistos/FatJetPlots/"+skimFilePrefix+".root";
   TFile *f = new TFile(filename.c_str(),"RECREATE");
   f->cd();
   for(map<string,TH1F*>::iterator h=    histos.begin(); h!=    histos.end();++h) h->second->Write();

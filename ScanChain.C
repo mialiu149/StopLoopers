@@ -13,8 +13,8 @@
 #include "TROOT.h"
 #include "TTreeCache.h"
 
-// StopBabies08252015
-#include "StopBabies08252015.cc"
+// StopBabies10012015
+#include "StopBabies10012015.cc"
 
 using namespace std;
 using namespace tas;
@@ -60,7 +60,7 @@ int ScanChain( TChain* chain, bool fast = true, int nEvents = -1, string skimFil
       ++nEventsTotal;
     
       // Progress
-      StopBabies08252015::progress( nEventsTotal, nEventsChain );
+      StopBabies10012015::progress( nEventsTotal, nEventsChain );
 
       // Analysis Code
 

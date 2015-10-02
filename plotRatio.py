@@ -110,7 +110,7 @@ def main():
 
 	    c.Update()
 	    pad1.SetLogy()
-	    c.SaveAs("~/public_html/ttz_z_comp/"+k.GetName().replace("_ttzjets", "") + ".pdf")
+	    c.SaveAs("~/public_html/ttz_z_comp/"+k.GetName().replace("_ttzjets_reco", "") + ".pdf")
 
 if __name__ == "__main__":
     main()
